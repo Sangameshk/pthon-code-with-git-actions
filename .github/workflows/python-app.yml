@@ -18,25 +18,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # Step 1: Checkout source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      # Step 2: Setup Python
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+          cache: "pip"
+          cache-dependency-path: requirements.txt
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install -r requirements.txt
 
+      # Step 4: Verify installed dependencies
+      - name: Verify dependencies
+        run: |
+          python --version
+          python -m pytest --version
+          python -m flake8 --version
+
+      # Step 5: Run Flake8 linting
       - name: Lint with flake8
         run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
+      # Step 6: Run Pytest
       - name: Test with pytest
         env:
           PYTHONPATH: src
         run: |
-          pytest -v tests/
+          python -m pytest -v tests/
